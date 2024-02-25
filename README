@@ -1,0 +1,42 @@
+Copyright Negoita Anca-Elena, 331 CA, 2023-2024
+
+Tema 3 APD - BitTorrent
+---------------------------------------------------------------------------------------------
+BitTorrent is a process where clients can download files and, at the same time, give 
+permission to other users to download files they already have or they also downloaded
+previously. In order to have an organised structure, a tracker was used to store informations
+about what segments of a file a client has, what files are seeding and how many files and
+clients are. The client sends to the tracker the files it needs to download, the tracker
+analyses how many segments of each file it already has and creates an array of elements
+that have more segments than each file has, in order of the wanted files. The struct used
+to store those informations is called torrentInfo:
+- int user; - the user that has the wanted file
+- int file; - the wanted file 
+- char hashes[MAX_CHUNKS][HASH_SIZE]; - the segments of the file the user has
+- int sizeFile; - the total size of the file 
+
+The array is sent to the client and the client starts downloading 10 segments in total.
+After analysing the structure, it downloads the number of segments necessary to finish 
+the file, which means it either downloads the remaining segments of the file to complete it
+and move to the next one, or 10 segments of the file. If a file is finished, the segments that where
+collected are printed in a specific file, and the program continues. If the client downloaded
+all the files it needed, it stops requesting files and stays in SEEDING. In the end, the
+client sends all the informations it has for each file(the number of segments) to the tracker.
+
+To simulate the process of requesting permission before acquiring a desired segment, the
+client initiates the interaction with the other client by sending a request. This request is
+essentially asking for permission to download the segment. Subsequently, the other client
+responds by sending a confirmation message, granting permission for the download to proceed.
+
+The swarming process happens inside the client function. It verifies how many users have the
+segments it needs. If there are more users than wanted segments, then 1 segment will be taken 
+from each one of them. If there are more segments, then the total number of wanted segments is
+divided by the number of users, this process repeating after taking the segments from a file and
+moving to the next user.
+
+In the end, if all the clients finished downloading, then the tracker sends a message to the seeders
+to stop uploading, and he closes himself.
+
+MPI is used to send request and responses between each process. The tracker informs a client about
+what it has, a client sends its current informations to the tracker, the tracker informs the seeders
+to stop the program.
